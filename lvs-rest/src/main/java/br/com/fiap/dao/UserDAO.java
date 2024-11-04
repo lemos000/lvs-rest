@@ -40,7 +40,8 @@ public class UserDAO {
 	            }
 	            return true;
 	        }
-
+	        stmt.close();
+	        
 	        return false;
 	    } catch (SQLException e) {
 	        System.err.println("Erro ao inserir usuário: " + e.getMessage());
@@ -71,7 +72,7 @@ public class UserDAO {
 		return "Atualizado com Sucesso!";
 	}
 	// Select 
-	public  User selecionar(int id) throws SQLException{
+	public User selecionar(int id) throws SQLException{
 		PreparedStatement stmt = minhaConexao.prepareStatement
 				("SELECT * FROM T_Users where user_id = ?");
 		stmt.setInt(1, id);
@@ -129,6 +130,7 @@ public class UserDAO {
 	                    return user;
 
 	                }
+	                stmt.close();
 	                return null;
 	            }
 	            
@@ -144,8 +146,10 @@ public class UserDAO {
 			stmt.setString(1, email);
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
+				stmt.close();
 				return true;
 			} else {
+				stmt.close();
 				return false;
 			}
 		}

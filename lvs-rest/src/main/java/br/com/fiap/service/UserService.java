@@ -15,45 +15,40 @@ public class UserService {
         this.userDAO = new UserDAO();
     }
     
-    public boolean verificarUser(String email, String senha) throws SQLException {
+    public User verificarUser(String email, String senha) throws SQLException {
         try {
             User user = userDAO.selecionarPorEmailESenha(email, senha);
-            return user != null;
+            return user;
         } catch (SQLException e) {
             System.out.println("Erro ao verificar usuário: " + e.getMessage());
             throw e;
         }
     }
 	public User selecionarUser(int id) throws ClassNotFoundException, SQLException {
-		UserDAO userdao = new UserDAO();
-		return userdao.selecionar(id);
+		return userDAO.selecionar(id);
 	}
 	public List<User> selecionarTodosUsers() throws ClassNotFoundException, SQLException {
-	    UserDAO userDao = new UserDAO();
-	    return userDao.selecionarTodos();
+	    return userDAO.selecionarTodos();
 	}
 
 	
 	public boolean cadastrarUser(User user) throws ClassNotFoundException, SQLException {
-	    UserDAO userDao = new UserDAO();
-	    boolean jaExiste = userDao.usuarioExiste(user.getEmail());
+	    boolean jaExiste = userDAO.usuarioExiste(user.getEmail());
 	    if (jaExiste) {
 	        return false;  
 	    }
 	  
-        return userDao.inserir(user);
+        return userDAO.inserir(user);
 	}
 		
 	public boolean deletarUser(int id) throws SQLException, ClassNotFoundException {
-		UserDAO userDAO = new UserDAO();
 		return userDAO.deletar(id);
 	}
 	 
 	
 	  public String atualizarUsuario(User user) throws ClassNotFoundException, SQLException {
-		  UserDAO userDao = new UserDAO();
 	        try {
-	            return userDao.atualizar(user);
+	            return userDAO.atualizar(user);
 	        } catch (SQLException e) {
 	            e.printStackTrace();
 	            return "Erro ao atualizar: " + e.getMessage();

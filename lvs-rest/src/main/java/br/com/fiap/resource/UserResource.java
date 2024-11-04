@@ -37,6 +37,7 @@ public class UserResource {
     public Response verificarUsuario(
             @QueryParam("email") String email,
             @QueryParam("senha") String senha) {
+
         try {
             if (email == null || senha == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -44,14 +45,10 @@ public class UserResource {
                              .build();
             }
 
-            boolean usuarioValido = userService.verificarUser(email, senha);
-            System.out.println("Email recebido: " + email);
-            System.out.println("Senha recebida: " + senha);
-            
-            if (usuarioValido) {
-                return Response.accepted()
-                             .entity("Usuário autenticado com sucesso")
-                             .build();
+            User usuarioValido = userService.verificarUser(email, senha);
+
+            if (usuarioValido != null) {
+                return Response.ok(usuarioValido).build();
             } else {
                 return Response.status(Response.Status.UNAUTHORIZED)
                              .entity("Usuário ou senha inválidos")
@@ -68,6 +65,7 @@ public class UserResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response cadastrarUsuario(User user) {
+    	System.out.println("Conectou");
         try {
             if (user == null || user.getEmail() == null || user.getSenha() == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
