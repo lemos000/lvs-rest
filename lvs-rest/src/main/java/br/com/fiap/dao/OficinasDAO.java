@@ -29,9 +29,13 @@ public class OficinasDAO implements AutoCloseable {
 
             stmt.executeUpdate();
             stmt.close();
+            minhaConexao.close();
+
             return true;
         } catch (SQLException e) {
             System.err.println("Erro ao inserir oficina: " + e.getMessage());
+            minhaConexao.close();
+
             throw e; 
         }
     }
@@ -42,6 +46,8 @@ public class OficinasDAO implements AutoCloseable {
             stmt.setString(1, nome);
             stmt.execute();
             stmt.close();
+            minhaConexao.close();
+
             return true;
         }
     }
@@ -55,6 +61,7 @@ public class OficinasDAO implements AutoCloseable {
             stmt.setString(4, oficina.getNome());
             stmt.executeUpdate();
             stmt.close();
+            minhaConexao.close();
             return "Atualizado com Sucesso!";
         }
     }
@@ -65,7 +72,7 @@ public class OficinasDAO implements AutoCloseable {
             stmt.setString(1, nome);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                	stmt.close();
+                    stmt.close();
                     return new Oficina(
                         rs.getString("nome"),
                         rs.getString("endereco"),
@@ -74,30 +81,37 @@ public class OficinasDAO implements AutoCloseable {
                     );
                 }
             }
-        }
-        return null;
+        } finally {
+        minhaConexao.close();
+    }
+    return null;
     }
 
     public List<Oficina> selecionarTodos() throws SQLException {
         List<Oficina> listaOficinas = new ArrayList<>();
         String sql = "SELECT * FROM T_Oficinas ORDER BY STATUS";
-        
+
         try (PreparedStatement stmt = minhaConexao.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            
+
             while (rs.next()) {
-            	
                 Oficina oficina = new Oficina(
                     rs.getString("nome"),
                     rs.getString("endereco"),
                     rs.getString("contato"),
                     rs.getString("status")
                 );
-                stmt.close();
                 listaOficinas.add(oficina);
             }
+        } catch (SQLException e) {
+            System.err.println("Erro ao selecionar todos as oficinas: " + e.getMessage());
+            throw e;
+        } finally {
+            if (minhaConexao != null && !minhaConexao.isClosed()) {
+                minhaConexao.close();
+            }
         }
-        
+
         return listaOficinas;
     }
 

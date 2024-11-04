@@ -3,8 +3,8 @@ package br.com.fiap.resource;
 import java.sql.SQLException;
 import java.util.List;
 
-import br.com.fiap.beans.Mecanico;
-import br.com.fiap.service.MecanicoService;
+import br.com.fiap.beans.Servico;
+import br.com.fiap.service.ServicoService;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -16,14 +16,14 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/mecanicos")
-public class MecanicoResource {
+@Path("/servicos")
+public class ServicoResource {
 
-    private MecanicoService mecanicoService;
+    private ServicoService servicoService;
 
-    public MecanicoResource() {
+    public ServicoResource() {
         try {
-            this.mecanicoService = new MecanicoService();
+            this.servicoService = new ServicoService();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -33,22 +33,22 @@ public class MecanicoResource {
     @Path("/cadastrar")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response cadastrarMecanico(Mecanico mecanico) {
+    public Response cadastrarServico(Servico servico) {
         try {
-            if (mecanico == null || mecanico.getNome() == null || mecanico.getCnpj() == null || mecanico.getEmail() == null) {
+            if (servico == null || servico.getDescricao() == null || servico.getTipoVeiculo() == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                               .entity("Dados do mecânico são obrigatórios")
+                               .entity("Dados do serviço são obrigatórios")
                                .build();
             }
 
-            boolean isCadastrado = mecanicoService.cadastrarMecanico(mecanico);
+            boolean isCadastrado = servicoService.cadastrarServico(servico);
             if (isCadastrado) {
                 return Response.status(Response.Status.CREATED)
-                               .entity("Mecânico cadastrado com sucesso")
+                               .entity("Serviço cadastrado com sucesso")
                                .build();
             } else {
                 return Response.status(Response.Status.BAD_REQUEST)
-                               .entity("Erro no cadastro do mecânico")
+                               .entity("Erro no cadastro do serviço")
                                .build();
             }
 
@@ -66,19 +66,19 @@ public class MecanicoResource {
     @GET
     @Path("/listar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response listarTodosMecanicos() {
+    public Response listarTodosServicos() {
         try {
-            List<Mecanico> mecanicos = mecanicoService.selecionarTodosMecanicos();
-            if (!mecanicos.isEmpty()) {
-                return Response.ok(mecanicos).build();
+            List<Servico> servicos = servicoService.selecionarTodosServicos();
+            if (!servicos.isEmpty()) {
+                return Response.ok(servicos).build();
             } else {
                 return Response.status(Response.Status.NO_CONTENT)
-                               .entity("Nenhum mecânico encontrado")
+                               .entity("Nenhum serviço encontrado")
                                .build();
             }
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Erro ao listar mecânicos: " + e.getMessage())
+                           .entity("Erro ao listar serviços: " + e.getMessage())
                            .build();
         }
     }
@@ -86,19 +86,19 @@ public class MecanicoResource {
     @GET
     @Path("/buscar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response buscarMecanico(@QueryParam("id") int mecanicoId) {
+    public Response buscarServico(@QueryParam("id") int servicoId) {
         try {
-            Mecanico mecanico = mecanicoService.selecionarMecanico(mecanicoId);
-            if (mecanico != null) {
-                return Response.ok(mecanico).build();
+            Servico servico = servicoService.selecionarServico(servicoId);
+            if (servico != null) {
+                return Response.ok(servico).build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
-                               .entity("Mecânico não encontrado")
+                               .entity("Serviço não encontrado")
                                .build();
             }
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Erro ao buscar mecânico: " + e.getMessage())
+                           .entity("Erro ao buscar serviço: " + e.getMessage())
                            .build();
         }
     }
@@ -107,26 +107,26 @@ public class MecanicoResource {
     @Path("/atualizar")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response atualizarMecanico(@QueryParam("id") int mecanicoId, Mecanico mecanico) {
+    public Response atualizarServico(@QueryParam("id") int servicoId, Servico servico) {
         try {
-            if (mecanicoId <= 0) {
+            if (servicoId <= 0) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                               .entity("ID do mecânico é obrigatório.")
+                               .entity("ID do serviço é obrigatório.")
                                .build();
             }
 
-            mecanico.setMecanico_id(mecanicoId);
-            String resultado = mecanicoService.atualizarMecanico(mecanico);
+            servico.setServicoId(servicoId);
+            String resultado = servicoService.atualizarServico(servico);
             if (resultado.equals("Atualizado com sucesso!")) {
                 return Response.ok(resultado).build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
-                               .entity("Mecânico não encontrado para atualizar")
+                               .entity("Serviço não encontrado para atualizar")
                                .build();
             }
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Erro ao atualizar mecânico: " + e.getMessage())
+                           .entity("Erro ao atualizar serviço: " + e.getMessage())
                            .build();
         }
     }
@@ -134,16 +134,16 @@ public class MecanicoResource {
     @DELETE
     @Path("/deletar")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deletarMecanico(@QueryParam("id") int mecanicoId) {
+    public Response deletarServico(@QueryParam("id") int servicoId) {
         try {
-            boolean resultado = mecanicoService.deletarMecanico(mecanicoId);
+            boolean resultado = servicoService.deletarServico(servicoId);
             if (resultado) {
                 return Response.status(Response.Status.OK)
-                               .entity("{ \"message\": \"Mecânico deletado com sucesso\" }")
+                               .entity("{ \"message\": \"Serviço deletado com sucesso\" }")
                                .build();
             } else {
                 return Response.status(Response.Status.NOT_FOUND)
-                               .entity("{ \"message\": \"Mecânico não encontrado\" }")
+                               .entity("{ \"message\": \"Serviço não encontrado\" }")
                                .build();
             }
         } catch (SQLException e) {
